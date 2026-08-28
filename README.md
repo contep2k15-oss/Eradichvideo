@@ -1,5 +1,8 @@
 # Tool Dịch Video Đa Ngôn Ngữ
 
+> 📦 Dự án này đã được đóng gói sẵn dạng git repo (có `.gitignore`, `LICENSE`, 1 commit khởi tạo).
+> Xem mục **"Đưa lên GitHub của riêng bạn"** ở cuối file để tải về và dùng ngay.
+
 App web đơn giản chạy local, thực hiện đầy đủ pipeline 12 bước:
 tải video → tách audio → ASR (Whisper) → phát hiện điểm nhạy văn hóa →
 dịch sát nghĩa → bản địa hóa hài/chơi chữ → QA dịch ngược → **review con người** →
@@ -104,6 +107,57 @@ frontend/
   index.html / style.css / app.js   # UI web đơn giản, không cần build tool
 jobs/                        # dữ liệu từng job (transcript, audio, video xuất ra)
 ```
+
+## Đưa lên GitHub của riêng bạn
+
+Dự án đã có sẵn git repo cục bộ (1 commit khởi tạo), bạn chỉ cần tạo repo trống trên
+GitHub rồi trỏ về đó. Không cần biết git chuyên sâu, làm theo đúng các bước sau:
+
+### Cách 1 — Dùng dòng lệnh (nhanh nhất)
+
+1. Vào **github.com** → bấm **New repository** → đặt tên (VD: `video-translate-tool`) →
+   **không** tick "Add a README" (vì repo này đã có sẵn) → **Create repository**.
+2. GitHub sẽ hiện ra 1 đường link dạng `https://github.com/<ten-ban>/video-translate-tool.git`
+   — copy link đó.
+3. Mở terminal tại thư mục dự án đã giải nén, chạy:
+
+```bash
+git remote add origin https://github.com/<ten-ban>/video-translate-tool.git
+git branch -M main
+git push -u origin main
+```
+
+4. Nhập tài khoản/Personal Access Token GitHub khi được hỏi (GitHub không còn nhận mật khẩu
+   thường qua dòng lệnh — vào **Settings → Developer settings → Personal access tokens** trên
+   GitHub để tạo token nếu chưa có).
+
+Từ lần sau, mỗi khi sửa code chỉ cần:
+```bash
+git add -A && git commit -m "Mô tả thay đổi" && git push
+```
+
+### Cách 2 — Không cần dòng lệnh (kéo-thả qua web)
+
+1. Tạo repo trống trên GitHub như bước 1 ở trên.
+2. Vào trang repo vừa tạo → **Add file → Upload files**.
+3. Kéo-thả toàn bộ các file/thư mục đã giải nén vào (trừ thư mục `jobs/` và file `.env`
+   nếu có — không nên đưa API key lên GitHub).
+4. Bấm **Commit changes**.
+
+### Sau khi đã có repo trên GitHub — người khác/máy khác tải về dùng thế nào
+
+```bash
+git clone https://github.com/<ten-ban>/video-translate-tool.git
+cd video-translate-tool
+cp .env.example .env    # rồi điền API key vào .env
+pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 8000
+```
+
+⚠️ **Không bao giờ commit file `.env`** (đã có sẵn trong `.gitignore`) vì file này chứa API
+key riêng của bạn — nếu lỡ đưa lên GitHub public, người khác có thể lấy trộm key và dùng
+tốn tiền tài khoản của bạn. Nếu lỡ commit rồi, phải thu hồi (revoke) key đó ngay trên trang
+Gemini/Anthropic và tạo key mới.
 
 ## Giới hạn của bản này (đáng biết trước khi dùng thật)
 
