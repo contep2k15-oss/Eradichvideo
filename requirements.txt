@@ -16,6 +16,7 @@ edge-tts==6.1.12
 # --- Gọi LLM (dịch + bản địa hóa hài) ---
 anthropic==0.34.2
 google-generativeai==0.8.2
+requests==2.32.3   # dùng cho provider openai_compatible (proxy bên thứ 3)
 
 # --- Xử lý audio/video (cần ffmpeg cài ở hệ điều hành, không phải qua pip) ---
 ffmpeg-python==0.2.0
