@@ -1,0 +1,21 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# --- ASR (chạy local trên GPU của bạn) ---
+faster-whisper==1.0.3
+
+# --- Tải video ---
+yt-dlp==2024.8.6
+
+# --- TTS free, cloud, không tốn VRAM ---
+edge-tts==6.1.12
+
+# --- Gọi LLM (dịch + bản địa hóa hài) ---
+anthropic==0.34.2
+google-generativeai==0.8.2
+
+# --- Xử lý audio/video (cần ffmpeg cài ở hệ điều hành, không phải qua pip) ---
+ffmpeg-python==0.2.0

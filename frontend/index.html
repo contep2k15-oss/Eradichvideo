@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tool Dịch Video Đa Ngôn Ngữ</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">映</span>
+        <div>
+          <h1>Xưởng Dịch Video</h1>
+          <p class="brand-sub">Sát nghĩa · Đúng văn hóa · Không tự động đăng</p>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="new">Job mới</button>
+        <button class="tab-btn" data-tab="jobs">Danh sách job</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ===== TAB: TẠO JOB MỚI ===== -->
+      <section id="tab-new" class="tab-panel active">
+        <div class="card form-card">
+          <h2>1. Đưa video vào xưởng</h2>
+          <form id="job-form">
+            <div class="field-row">
+              <label>Nguồn video</label>
+              <div class="source-toggle">
+                <button type="button" class="src-btn active" data-src="url">Dán link</button>
+                <button type="button" class="src-btn" data-src="file">Upload file</button>
+              </div>
+            </div>
+
+            <div class="field" id="field-url">
+              <input type="text" id="source_url" placeholder="https://youtube.com/watch?v=..." />
+            </div>
+            <div class="field hidden" id="field-file">
+              <input type="file" id="source_file" accept="video/*" />
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label>Ngôn ngữ nguồn (tùy chọn, để trống nếu tự nhận diện)</label>
+                <input type="text" id="source_lang" placeholder="VD: en, ja, ko..." />
+              </div>
+              <div class="field">
+                <label>Ngôn ngữ đích *</label>
+                <select id="target_lang">
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="en">English</option>
+                  <option value="ja">日本語</option>
+                  <option value="ko">한국어</option>
+                  <option value="zh">中文</option>
+                  <option value="th">ไทย</option>
+                  <option value="id">Bahasa Indonesia</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Thể loại nội dung (tùy chọn)</label>
+                <select id="content_genre">
+                  <option value="">Tự động nhận diện</option>
+                  <option value="hai">Hài</option>
+                  <option value="trang_trong">Trang trọng</option>
+                  <option value="giao_duc">Giáo dục</option>
+                  <option value="doi_thuong">Đời thường</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn">Bắt đầu xử lý (bước 1 → 6)</button>
+          </form>
+        </div>
+
+        <div class="card progress-card hidden" id="progress-card">
+          <h2>2. Tiến trình pipeline</h2>
+          <ol class="steps-track" id="steps-track"></ol>
+          <p class="job-id-line">Job ID: <code id="current-job-id"></code></p>
+        </div>
+
+        <!-- ===== BƯỚC 7: REVIEW CON NGƯỜI ===== -->
+        <div class="card review-card hidden" id="review-card">
+          <h2>3. Duyệt lại bản dịch (bước 7)</h2>
+          <p class="hint">
+            Các dòng <span class="tag tag-culture">tô cam</span> là đoạn hài/chơi chữ đã được bản địa hóa —
+            và <span class="tag tag-qa">tô đỏ</span> là đoạn AI cảnh báo có thể lệch nghĩa. Ưu tiên kiểm tra kỹ các dòng này trước.
+          </p>
+          <div class="review-table-wrap">
+            <table class="review-table" id="review-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Câu gốc</th>
+                  <th>Ghi chú AI</th>
+                  <th>Bản dịch cuối (có thể sửa)</th>
+                </tr>
+              </thead>
+              <tbody id="review-tbody"></tbody>
+            </table>
+          </div>
+          <button class="primary-btn" id="submit-review-btn">Duyệt xong → Lồng tiếng &amp; xuất video (bước 8 → 12)</button>
+        </div>
+
+        <!-- ===== KẾT QUẢ ===== -->
+        <div class="card result-card hidden" id="result-card">
+          <h2>4. Kết quả</h2>
+          <div id="result-links"></div>
+        </div>
+      </section>
+
+      <!-- ===== TAB: DANH SÁCH JOB ===== -->
+      <section id="tab-jobs" class="tab-panel">
+        <div class="card">
+          <h2>Tất cả job</h2>
+          <div id="jobs-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
