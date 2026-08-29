@@ -1,0 +1,76 @@
+name: Build Windows App
+
+# Kích hoạt build tự động khi:
+# 1. Đẩy 1 tag dạng v1.0.0, v1.2.3... lên GitHub (cách dùng chính)
+# 2. Hoặc bấm nút "Run workflow" thủ công trên tab Actions (để test không cần tạo tag)
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cài thư viện Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Tải ffmpeg.exe (bản tĩnh, nhúng sẵn vào app)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path ffmpeg_bin
+          Invoke-WebRequest -Uri "https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip" -OutFile ffmpeg.zip
+          Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extracted
+          $binFolder = Get-ChildItem -Path ffmpeg_extracted -Recurse -Directory -Filter "bin" | Select-Object -First 1
+          Copy-Item "$($binFolder.FullName)\ffmpeg.exe" -Destination "ffmpeg_bin\ffmpeg.exe"
+          Copy-Item "$($binFolder.FullName)\ffprobe.exe" -Destination "ffmpeg_bin\ffprobe.exe"
+          Remove-Item ffmpeg.zip, ffmpeg_extracted -Recurse -Force
+
+      - name: Tạo icon app
+        run: python gen_icon.py
+
+      - name: Đóng gói bằng PyInstaller
+        run: pyinstaller video_translate_tool.spec
+
+      - name: Gộp ffmpeg vào cùng thư mục với file .exe
+        shell: pwsh
+        run: |
+          Copy-Item -Path ffmpeg_bin -Destination "dist\ffmpeg_bin" -Recurse
+
+      - name: Thêm file .env.example và README vào gói phát hành
+        shell: pwsh
+        run: |
+          Copy-Item .env.example dist\.env.example
+          Copy-Item README.md dist\README.md
+
+      - name: Đóng gói thành file .zip để phát hành
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          Compress-Archive -Path dist\* -DestinationPath "VideoTranslateTool-$version-win64.zip"
+
+      - name: Tải lên GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: VideoTranslateTool-*-win64.zip
+          generate_release_notes: true
+
+      - name: Lưu lại làm artifact (khi chạy thủ công, không có tag)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoTranslateTool-win64
+          path: VideoTranslateTool-*-win64.zip

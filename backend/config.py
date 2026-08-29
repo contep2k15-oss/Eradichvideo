@@ -2,7 +2,14 @@ import os
 import sys
 from dotenv import load_dotenv
 
-load_dotenv()
+# Khi đã đóng gói .exe (sys.frozen=True), file .env phải nằm CÙNG THƯ MỤC với
+# file .exe thật (nơi người dùng đặt/sửa file .env), KHÔNG PHẢI thư mục tạm mà
+# PyInstaller tự giải nén ra lúc chạy (sys._MEIPASS) — 2 nơi này khác nhau.
+if getattr(sys, "frozen", False):
+    _env_path = os.path.join(os.path.dirname(sys.executable), ".env")
+    load_dotenv(_env_path)
+else:
+    load_dotenv()
 
 
 def resource_path(*parts) -> str:
@@ -57,7 +64,13 @@ class Settings:
     WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cuda")
     WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 
-    JOBS_DIR = os.getenv("JOBS_DIR", "./jobs")
+    JOBS_DIR = os.getenv("JOBS_DIR") or (
+        # Khi đã đóng gói .exe: lưu job cạnh file .exe, không phụ thuộc thư mục
+        # làm việc hiện tại (có thể không như mong đợi khi double-click trên Windows).
+        os.path.join(os.path.dirname(sys.executable), "jobs")
+        if getattr(sys, "frozen", False)
+        else "./jobs"
+    )
 
 
 settings = Settings()
