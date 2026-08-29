@@ -7,6 +7,7 @@ tảng, lưu vào thư mục output/<nen_tang>/ để người dùng tự tải 
 import os
 import subprocess
 from typing import Dict
+from ..config import find_ffmpeg_binary
 
 # preset: (width, height, video_bitrate)
 PRESETS = {
@@ -37,7 +38,7 @@ def export_all(final_video_path: str, out_dir: str, use_nvenc: bool = True) -> D
 
         video_codec = ["-c:v", "h264_nvenc"] if use_nvenc else ["-c:v", "libx264"]
         cmd = [
-            "ffmpeg", "-y", "-i", final_video_path,
+            find_ffmpeg_binary("ffmpeg"), "-y", "-i", final_video_path,
             "-vf", _crop_scale_filter(w, h),
             *video_codec, "-b:v", bitrate,
             "-c:a", "aac", "-b:a", "128k",

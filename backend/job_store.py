@@ -42,8 +42,12 @@ def list_jobs() -> list:
     if not os.path.isdir(settings.JOBS_DIR):
         return []
     out = []
-    for job_id in os.listdir(settings.JOBS_DIR):
-        job = load_job(job_id)
+    for entry in os.listdir(settings.JOBS_DIR):
+        # Bỏ qua file không phải job (VD: ".gitkeep" dùng để git giữ thư mục
+        # rỗng) — chỉ những thư mục con thật sự mới là job hợp lệ.
+        if not os.path.isdir(os.path.join(settings.JOBS_DIR, entry)):
+            continue
+        job = load_job(entry)
         if job:
             out.append(job)
     return sorted(out, key=lambda j: j.id, reverse=True)

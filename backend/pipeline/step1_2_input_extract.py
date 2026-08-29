@@ -6,6 +6,7 @@ Chạy nhẹ, không cần GPU. yt-dlp và ffmpeg phải có sẵn trên máy (c
 """
 import os
 import subprocess
+from ..config import find_ffmpeg_binary
 
 
 def download_video(url: str, out_dir: str) -> str:
@@ -32,7 +33,7 @@ def extract_audio(video_path: str, out_dir: str) -> str:
     """Tách audio mono 16kHz WAV — định dạng chuẩn faster-whisper khuyến nghị."""
     audio_path = os.path.join(out_dir, "audio.wav")
     cmd = [
-        "ffmpeg", "-y", "-i", video_path,
+        find_ffmpeg_binary("ffmpeg"), "-y", "-i", video_path,
         "-ac", "1", "-ar", "16000",
         "-vn", audio_path,
     ]

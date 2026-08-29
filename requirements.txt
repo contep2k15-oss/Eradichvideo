@@ -20,3 +20,9 @@ requests==2.32.3   # dùng cho provider openai_compatible (proxy bên thứ 3)
 
 # --- Xử lý audio/video (cần ffmpeg cài ở hệ điều hành, không phải qua pip) ---
 ffmpeg-python==0.2.0
+
+# --- Cửa sổ app desktop (thay cho việc mở tab trình duyệt) ---
+pywebview==5.3.2
+
+# --- Đóng gói thành file .exe (chỉ cần khi build, không cần khi chạy code thường) ---
+pyinstaller==6.10.0

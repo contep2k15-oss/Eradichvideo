@@ -12,13 +12,14 @@ import os
 import subprocess
 from typing import List, Optional
 from ..models import Segment
+from ..config import find_ffmpeg_binary
 
 MIN_ATEMPO, MAX_ATEMPO = 0.85, 1.35  # giới hạn co giãn để giọng không bị biến dạng nghe rõ
 
 
 def _get_duration(path: str) -> float:
     cmd = [
-        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+        find_ffmpeg_binary("ffprobe"), "-v", "error", "-show_entries", "format=duration",
         "-of", "default=noprint_wrappers=1:nokey=1", path,
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
@@ -39,7 +40,7 @@ def sync_segment_audio(segment_audio_path: Optional[str], segment: Segment, out_
 
     out_path = os.path.join(out_dir, os.path.basename(segment_audio_path).replace(".mp3", "_synced.mp3"))
     cmd = [
-        "ffmpeg", "-y", "-i", segment_audio_path,
+        find_ffmpeg_binary("ffmpeg"), "-y", "-i", segment_audio_path,
         "-filter:a", f"atempo={tempo:.3f}",
         out_path,
     ]

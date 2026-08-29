@@ -13,6 +13,7 @@ import os
 import subprocess
 from typing import List, Optional
 from ..models import Segment
+from ..config import find_ffmpeg_binary
 
 
 def build_full_audio_track(
@@ -40,7 +41,7 @@ def build_full_audio_track(
     filter_complex = ";".join(filter_parts) + f";{mix_inputs}amix=inputs={len(valid)}:normalize=0[out]"
 
     cmd = [
-        "ffmpeg", "-y", *inputs,
+        find_ffmpeg_binary("ffmpeg"), "-y", *inputs,
         "-filter_complex", filter_complex,
         "-map", "[out]",
         "-t", str(total_duration),
@@ -64,7 +65,7 @@ def mux_final_video(
 
     video_codec = ["-c:v", "h264_nvenc"] if use_nvenc else ["-c:v", "libx264"]
 
-    cmd = ["ffmpeg", "-y", "-i", video_path, "-i", dubbed_audio_path]
+    cmd = [find_ffmpeg_binary("ffmpeg"), "-y", "-i", video_path, "-i", dubbed_audio_path]
     if subtitle_path and os.path.exists(subtitle_path):
         cmd += ["-i", subtitle_path]
         cmd += ["-map", "0:v:0", "-map", "1:a:0", "-map", "2:0"]

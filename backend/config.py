@@ -1,7 +1,39 @@
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def resource_path(*parts) -> str:
+    """
+    Trả về đường dẫn đúng dù app đang chạy dạng mã nguồn thường (python -m ...)
+    hay đã được PyInstaller đóng gói thành 1 file .exe (lúc đó file được giải nén
+    tạm vào thư mục sys._MEIPASS, không phải thư mục chứa file .py nữa).
+    """
+    if getattr(sys, "frozen", False):
+        base = sys._MEIPASS
+    else:
+        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, *parts)
+
+
+def find_ffmpeg_binary(binary_name: str) -> str:
+    """
+    Tìm ffmpeg/ffprobe theo thứ tự ưu tiên:
+    1. Bản nhúng sẵn cùng thư mục với file .exe khi đã đóng gói (giống cách
+       ai-era-media-2 nhúng ffmpeg-static — người dùng không cần tự cài ffmpeg).
+    2. Nếu không có bản nhúng, dùng lệnh hệ thống bình thường (yêu cầu đã cài
+       ffmpeg và có trong PATH — đúng như khi chạy bằng mã nguồn thông thường).
+    """
+    exe_name = f"{binary_name}.exe" if os.name == "nt" else binary_name
+
+    if getattr(sys, "frozen", False):
+        bundled = os.path.join(os.path.dirname(sys.executable), "ffmpeg_bin", exe_name)
+        if os.path.exists(bundled):
+            return bundled
+
+    return binary_name  # fallback: trông cậy vào PATH hệ thống
 
 
 class Settings:
